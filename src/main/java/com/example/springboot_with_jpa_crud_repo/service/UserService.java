@@ -1,9 +1,12 @@
-package com.example.springboot_with_jpa_crud_repo;
+package com.example.springboot_with_jpa_crud_repo.service;
 
 import java.util.List;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.example.springboot_with_jpa_crud_repo.model.User;
+import com.example.springboot_with_jpa_crud_repo.repository.UserRepository;
 
 @Service 
 public class UserService {
@@ -20,7 +23,7 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public User creatUser(User user) {
+    public User createUser(User user) {
         if (user.getPassword() == null || user.getPassword().isBlank()) {
             throw new IllegalArgumentException("Password is required");
         }

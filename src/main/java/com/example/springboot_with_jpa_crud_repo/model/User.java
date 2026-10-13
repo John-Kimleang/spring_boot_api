@@ -1,4 +1,4 @@
-package com.example.springboot_with_jpa_crud_repo;
+package com.example.springboot_with_jpa_crud_repo.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -21,7 +21,7 @@ public class User {
     private String name; 
 
 
-    @Column(name = "email", unique = true)
+    @Column(name = "email", length = 191, nullable = false, unique = true)
     private String email;
 
     @JsonIgnore

@@ -1,4 +1,4 @@
-package com.example.springboot_with_jpa_crud_repo;
+package com.example.springboot_with_jpa_crud_repo.security;
 
 import java.io.IOException;
 
@@ -13,6 +13,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
+import com.example.springboot_with_jpa_crud_repo.service.JwtService;
+import com.example.springboot_with_jpa_crud_repo.service.RevokedTokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

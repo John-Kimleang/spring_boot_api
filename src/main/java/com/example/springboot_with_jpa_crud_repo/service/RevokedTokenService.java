@@ -1,4 +1,4 @@
-package com.example.springboot_with_jpa_crud_repo;
+package com.example.springboot_with_jpa_crud_repo.service;
 
 import java.time.Instant;
 import java.util.Map;

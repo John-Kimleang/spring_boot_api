@@ -1,4 +1,4 @@
-package com.example.springboot_with_jpa_crud_repo;
+package com.example.springboot_with_jpa_crud_repo.service;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
