@@ -28,7 +28,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: hahaha/spring-boot-api:1.0
+          tags: kimleanggg/spring-boot-api:latest
 
       - name: Deploy to Contabo VPS
         uses: appleboy/ssh-action@v1
