@@ -67,23 +67,32 @@ public class AuthController {
     @PostMapping({ "/signin", "/login" })
     public ResponseEntity<?> signIn(@RequestBody SignInRequest request) {
         if (request.email() == null || request.password() == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please enter password or email");
         }
         User user = userRepository.findByEmail(request.email().trim().toLowerCase())
                 .orElse(null);
         if (user == null) {
             logger.warn("Login failed: no user found for normalized email {}", request.email().trim().toLowerCase());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
         }
-        if (user.getPasswordHash() == null || user.getPasswordHash().isBlank()) {
+        String storedPasswordHash = user.getPasswordHash();
+        if (storedPasswordHash == null || storedPasswordHash.isBlank()) {
             logger.warn("Login failed: user {} has no password hash", user.getEmail());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please enter password");
         }
-        boolean passwordMatches = passwordEncoder.matches(request.password(), user.getPasswordHash());
+
+        boolean passwordMatches = passwordEncoder.matches(request.password(), storedPasswordHash);
+        if (!passwordMatches && storedPasswordHash.equals(request.password())) {
+            logger.warn("Migrating legacy plaintext password for user {}", user.getEmail());
+            user.setPasswordHash(passwordEncoder.encode(request.password()));
+            userRepository.save(user);
+            passwordMatches = true;
+        }
+
         logger.info("Login password check for {}: hashLength={}, matches={}",
-                user.getEmail(), user.getPasswordHash().length(), passwordMatches);
+                user.getEmail(), storedPasswordHash.length(), passwordMatches);
         if (!passwordMatches) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect password");
         }
         return ResponseEntity.ok(new AuthResponse(jwtService.createToken(user.getEmail()), "Bearer",
                 jwtService.getTokenLifetimeSeconds()));
