@@ -11,7 +11,7 @@ public class SpringbootWithJpaCrudRepoApplication {
 
 	@RequestMapping("/")
 	String SayHello(){
-		return "Hello guy! welcome to my chhanel";
+		return "Hello guy! welcome to my api channel (automate deployment Github Action + Docker)";
 	}
 
 	public static void main(String[] args) {

@@ -1,5 +1,5 @@
 
-name: Deploy Spring Boot API 
+name: Deploy Spring Boot API
 # CI/CD
 
 on:
