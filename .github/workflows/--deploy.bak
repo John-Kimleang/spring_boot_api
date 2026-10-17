@@ -1,0 +1,73 @@
+
+# Name displayed in GitHub's Actions tab
+name: Deploy Spring Boot API
+
+# Run this workflow whenever code is pushed to the main branch
+on:
+  push:
+    branches:
+      - main
+
+# Give the workflow read-only access to repository contents
+permissions:
+  contents: read
+
+# Define the job that builds and deploys the application
+jobs:
+  deploy:
+    # GitHub provides a temporary Ubuntu machine to run these commands
+    runs-on: ubuntu-latest
+
+    # Execute these steps in order
+    steps:
+      # Step 1: Download the repository source code onto GitHub's runner
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Log in to Docker Hub so the runner can upload images
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          # Read your Docker Hub username from GitHub repository secrets
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+
+          # Read your Docker Hub access token from GitHub repository secrets
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Step 3: Build the image using your Dockerfile and push it to Docker Hub
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          # Use the current repository directory as the Docker build context
+          context: .
+
+          # Upload the built image to Docker Hub
+          push: true
+
+          # Docker Hub username / image repository / image tag
+          tags: hahaha/spring-boot-api:1.0
+
+      # Step 4: Connect to your Contabo VPS using SSH
+      - name: Deploy to Contabo VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          # Public IP address of your VPS
+          host: ${{ secrets.VPS_HOST }}
+
+          # Linux username used to log in to your VPS
+          username: ${{ secrets.VPS_USERNAME }}
+
+          # Private SSH key stored securely in GitHub repository secrets
+          key: ${{ secrets.VPS_SSH_KEY }}
+
+          # Commands below execute remotely on your VPS
+          script: |
+            # Enter the directory containing compose.yaml and .env
+            cd /root/spring-api
+
+            # Download the image specified for the API service in compose.yaml
+            docker compose pull api
+
+            # Recreate/update only the API service in the background
+            # --no-deps prevents Compose from starting or updating MySQL
+            docker compose up -d --no-deps api
